@@ -939,6 +939,26 @@ const LEVELS = [
 ];
 
 /* ============================================================
+   ORDRE DES PROPOSITIONS
+   Les questions sont rédigées avec la bonne réponse en tête ;
+   on applique ici une rotation déterministe pour qu'elle ne
+   reste pas à la même place d'une question à l'autre. La
+   rotation conserve l'ordre relatif des propositions.
+   ============================================================ */
+const DECALAGE = [2,0,3,1, 1,3,0,2, 3,1,2,0, 0,2,1,3, 2,3,0,1];
+(function melangerPropositions(liste){
+  let k = 0;
+  liste.forEach(q => {
+    if(!q.options) return;
+    const t = DECALAGE[k++ % DECALAGE.length];
+    for(let n = 0; n < t; n++){
+      q.options.unshift(q.options.pop());
+      q.correct = (q.correct + 1) % q.options.length;
+    }
+  });
+})(LEVELS.flatMap(lv => lv.questions));
+
+/* ============================================================
    ÉTAT
    ============================================================ */
 const state = {
@@ -1359,7 +1379,7 @@ function showFinal(){
       prio.join(', ') + '. Le reste peut être survolé rapidement.</div>';
   } else if(faits.length === LEVELS.length){
     pz.innerHTML = '<div class="note-doux" style="margin-top:20px"><strong>Aucune priorité rouge.</strong> ' +
-      'Les fondations tiennent. Le temps de cours peut aller directement aux thèmes suivants : équations, second degré et fonctions.</div>';
+            'Les fondations tiennent. Le temps de cours peut aller directement aux thèmes suivants : équations, second degré et fonctions.</div>';
   } else {
     pz.innerHTML = '';
   }
